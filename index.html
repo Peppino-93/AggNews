@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AggNews AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f2f2f7; 
+            --card-low: #ffffff;      /* Bassa: Sfondo bianco */
+            --card-medium: #e1f5fe;   /* Media: Azzurro chiarissimo */
+            --card-high: #90caf9;     /* Alta: Azzurro schiarito per TESTO NERO perfetto */
+            --card-extreme: #001d3d;  /* Altissima: Blu scuro, testo bianco */
+            --text-dark: #1c1c1e;
+            --text-light: #ffffff;
+        }
+
+        body { font-family: 'Inter', -apple-system, sans-serif; background-color: var(--bg-color); color: var(--text-dark); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .container { width: 100%; max-width: 500px; }
+        header { width: 100%; padding: 20px 0; margin-bottom: 10px; }
+        header h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; margin: 0; }
+        
+        .news-card { position: relative; border-radius: 24px; padding: 20px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        
+        /* Priorità - Colori Testo */
+        .priority-Bassa { background-color: var(--card-low); color: var(--text-dark); }
+        .priority-Media { background-color: var(--card-medium); color: var(--text-dark); }
+        .priority-Alta { background-color: var(--card-high); color: var(--text-dark); }
+        .priority-Altissima { background-color: var(--card-extreme); color: var(--text-light); }
+        
+        .source-info { font-size: 11px; font-weight: 700; text-transform: uppercase; opacity: 0.8; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+        .content { font-size: 16px; line-height: 1.4; font-weight: 500; margin-bottom: 10px; }
+        
+        /* Tasto Continua e Testo Esteso */
+        .btn-continua { font-size: 12px; font-weight: 700; color: #007aff; cursor: pointer; display: inline-block; margin-bottom: 15px; background: rgba(0,122,255,0.1); padding: 4px 10px; border-radius: 10px;}
+        .priority-Altissima .btn-continua { color: #ffffff; background: rgba(255,255,255,0.2); }
+        .testo-esteso { display: none; font-size: 14px; line-height: 1.5; font-weight: 400; margin-bottom: 15px; opacity: 0.9; padding: 12px; background: rgba(0,0,0,0.04); border-radius: 8px; }
+        .priority-Altissima .testo-esteso { background: rgba(255,255,255,0.1); }
+
+        .footer-tools { display: flex; justify-content: space-between; align-items: center; }
+        .banners { display: flex; gap: 6px; }
+        .banner { font-size: 10px; font-weight: 700; padding: 5px 10px; border-radius: 8px; background: rgba(0, 0, 0, 0.05); border: 1px solid rgba(0, 0, 0, 0.05); cursor: pointer; color: inherit; text-decoration: none;}
+        .priority-Altissima .banner { background: rgba(255, 255, 255, 0.15); border-color: rgba(255, 255, 255, 0.1); color: white; }
+        
+        .plus-btn { width: 28px; height: 28px; background: rgba(0,0,0,0.05); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; }
+        .priority-Altissima .plus-btn { background: rgba(255,255,255,0.2); }
+        
+        .related-news { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(0,0,0,0.1); font-size: 13px; }
+        .priority-Altissima .related-news { border-top: 1px solid rgba(255,255,255,0.2); }
+        .related-news ul { margin: 0; padding-left: 20px; }
+        .related-news li { margin-bottom: 12px; line-height: 1.3; }
+        .related-news a { text-decoration: underline; font-weight: bold; opacity: 0.9; color: inherit;}
+        .titolo-correlata { font-style: italic; opacity: 0.8; display: block; margin: 3px 0; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>AggNews</h1>
+            <p id="clock" style="font-size: 13px; opacity: 0.5; margin: 5px 0;"></p>
+        </header>
+        <div id="feed"></div>
+    </div>
+
+    <script src="notizie.js"></script>
+
+    <script>
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' }).toUpperCase();
+        }
+        updateClock();
+
+        function toggleElement(id) {
+            const el = document.getElementById(id);
+            el.style.display = (el.style.display === "none" || el.style.display === "") ? "block" : "none";
+        }
+
+        function displayNews() {
+            const feed = document.getElementById('feed');
+            feed.innerHTML = '';
+
+            // 1. ORDINAMENTO RIGOROSO TEMPORALE (Anti-cronologico Puro)
+            // L'orario e il timestamp vincono su tutto, a prescindere dall'importanza!
+            newsData.sort((a, b) => b.timestamp - a.timestamp);
+
+            // 2. RAGGRUPPAMENTO NOTIZIE CORRELATE
+            const gruppi = {};
+            newsData.forEach(item => {
+                const idG = item.id_gruppo !== undefined ? item.id_gruppo : item.titolo_orig;
+                if (!gruppi[idG]) gruppi[idG] = [];
+                gruppi[idG].push(item);
+            });
+
+            // 3. RENDERIZZAZIONE
+            for (const id_gruppo in gruppi) {
+                const correlate = gruppi[id_gruppo];
+                const mainItem = correlate[0];
+                const uid = Math.random().toString(36).substr(2, 9); 
+
+                let bannersHTML = '';
+                const lang = (mainItem.lingua_originale || '').toUpperCase();
+                if (lang === 'EN') {
+                    bannersHTML = `<a href="${mainItem.link}" target="_blank" class="banner">FONTE</a>`;
+                } else if (lang !== 'IT' && lang !== 'EN') {
+                    const linkTranslate = `https://translate.google.com/translate?sl=auto&tl=en&u=${encodeURIComponent(mainItem.link)}`;
+                    bannersHTML = `<a href="${linkTranslate}" target="_blank" class="banner">EN</a>
+                                   <a href="${mainItem.link}" target="_blank" class="banner">FONTE</a>`;
+                }
+
+                let plusBtnHTML = `<div style="width: 28px;"></div>`; 
+                let relatedHTML = '';
+                if (correlate.length > 1) {
+                    plusBtnHTML = `<div class="plus-btn" onclick="toggleElement('rel-${uid}')">+</div>`;
+                    relatedHTML = `<div id="rel-${uid}" class="related-news"><ul>`;
+                    for (let i = 1; i < correlate.length; i++) {
+                        // ORA SI VEDE IL TITOLO ORIGINALE (classe titolo-correlata)
+                        relatedHTML += `<li><b>${correlate[i].orario} | ${correlate[i].testata}</b>
+                                        <span class="titolo-correlata">${correlate[i].titolo_orig}</span>
+                                        <a href="${correlate[i].link}" target="_blank">Continua a leggere la fonte</a></li>`;
+                    }
+                    relatedHTML += `</ul></div>`;
+                }
+
+                // TASTO CONTINUA
+                let continuaHTML = '';
+                if (mainItem.contenuto_esteso && mainItem.contenuto_esteso.length > 15) {
+                    continuaHTML = `
+                        <div class="btn-continua" onclick="toggleElement('ext-${uid}')">CONTINUA L'ANTEPRIMA</div>
+                        <div id="ext-${uid}" class="testo-esteso">${mainItem.contenuto_esteso}</div>
+                    `;
+                }
+
+                const cssPriority = mainItem.priorita.charAt(0).toUpperCase() + mainItem.priorita.slice(1).toLowerCase();
+
+                const cardHTML = `
+                    <div class="news-card priority-${cssPriority}">
+                        <div class="source-info">
+                            <span>${mainItem.orario}</span> • <span>${mainItem.testata}</span>
+                        </div>
+                        <div class="content">
+                            ${mainItem.testo_it}
+                        </div>
+                        ${continuaHTML}
+                        <div class="footer-tools">
+                            <div class="banners">${bannersHTML}</div>
+                            ${plusBtnHTML}
+                        </div>
+                        ${relatedHTML}
+                    </div>
+                `;
+                
+                feed.insertAdjacentHTML('beforeend', cardHTML);
+            }
+        }
+
+        displayNews();
+    </script>
+</body>
+</html>
