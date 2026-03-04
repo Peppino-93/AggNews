@@ -32,10 +32,12 @@
             border-bottom: 1px solid rgba(0,0,0,0.05);
             display: flex; 
             justify-content: space-between; 
+            /* Modifica fondamentale: allinea gli elementi partendo dal basso */
             align-items: flex-end; 
         }
         
         .header-left { flex: 0 0 auto; display: flex; flex-direction: column; justify-content: flex-end; }
+        /* Riportato a dimensioni grandi e imponenti */
         header h1 { font-size: 32px; font-weight: 800; letter-spacing: -1px; margin: 0; line-height: 1; color: #002244;}
         header p#clock { font-size: 13px; font-weight: 600; opacity: 0.6; margin: 6px 0 1px 0; line-height: 1; }
 
@@ -43,7 +45,7 @@
             flex: 1 1 auto;
             display: flex;
             flex-direction: column;
-            justify-content: flex-end;
+            justify-content: flex-end; /* Spinge le righe verso la linea di base inferiore */
             gap: 3px; 
             padding-left: 25px; 
             overflow: hidden;
@@ -126,20 +128,9 @@
             }
         }
 
-        // --- NUOVO SISTEMA ANTI-CRASH PER SAFARI ---
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-        }
-        // -------------------------------------------
-
         function generaTrendingTags() {
-            if (typeof newsData === 'undefined' || newsData.length === 0) return;
-
             const container = document.getElementById('trending-topics');
-            if (!container) return;
+            if (typeof newsData === 'undefined' || newsData.length === 0 || !container) return;
 
             const stopWords = [
                 'il','lo','la','i','gli','le','un','uno','una','di','a','da','in','con','su','per','tra','fra','che','e','ed','o','ma','se','non','più','come','al','del','della','delle','dei','degli','alla','alle','ai','agli','dal','dalla','dalle','dai','dagli','nel','nella','nelle','nei','negli','sul','sulla','sulle','sui','sugli','è','ha','hanno','sono','essere','stato','stata','stati','questo','questa','quello','quella','ci','si','ne','da','fa','fare','cui','chi','cosa','anche','dopo','due','tre','anni','giorni','oggi','ieri','può','senza','quando','dove','loro','tutti','tutto','stesso','stessa','nuovo','nuova','dell','all','sull','dall','nell','c\'è','vengono','viene','prima','secondo','parte','sarebbe','fatto',
@@ -151,8 +142,7 @@
                 if(news.testo_it) testoTotale += " " + news.testo_it.toLowerCase();
             });
 
-            // Regex alleggerita per non far arrabbiare Safari
-            let parole = testoTotale.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()"'’]/g, " ").split(/\s+/);
+            let parole = testoTotale.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()""''’]/g," ").split(/\s+/);
             let conteggioGrezzo = {};
 
             parole.forEach(p => {
@@ -185,14 +175,26 @@
 
             let arrParole = Object.keys(conteggioPulito).map(k => ({ parola: k, count: conteggioPulito[k] }));
             arrParole.sort((a, b) => b.count - a.count);
-            
-            let topWords = arrParole.slice(0, 14);
+
+            // --- INIZIO MODIFICA RESPONSIVE ---
+            // Controlla se lo schermo è stretto (meno di 480px, tipico degli smartphone in verticale)
+            const isMobilePortrait = window.innerWidth <= 480;
+
+            // Se è verticale mostra 10 parole, altrimenti 14
+            const numParole = isMobilePortrait ? 10 : 14; 
+            let topWords = arrParole.slice(0, numParole);
             if(topWords.length === 0) return;
 
             const fontWeights = [900, 800, 700, 700, 600, 600, 500, 500, 400, 400, 300, 300, 300, 300];
-            const fontSizes = [15, 14, 14, 13, 13, 12, 12, 11, 11, 10, 10, 10, 10, 10]; 
-            const colors = ['#001833', '#00264d', '#003366', '#004080', '#004d99', '#0059b3', '#0066cc', '#0073e6', '#1a82ff', '#3391ff', '#4d9fff', '#5ca8ff', '#5ca8ff', '#5ca8ff'];
 
+            // Array con i font rimpiccioliti per il telefono in verticale
+            const fontSizes = isMobilePortrait 
+                ? [13, 12, 12, 11, 11, 10, 10, 9, 9, 9, 9, 9, 9, 9] 
+                : [15, 14, 14, 13, 13, 12, 12, 11, 11, 10, 10, 10, 10, 10]; 
+
+            const colors = ['#001833', '#00264d', '#003366', '#004080', '#004d99', '#0059b3', '#0066cc', '#0073e6', '#1a82ff', '#3391ff', '#4d9fff', '#5ca8ff', '#5ca8ff', '#5ca8ff'];
+            // --- FINE MODIFICA RESPONSIVE ---
+            
             let paroleStilizzate = topWords.map((item, index) => {
                 return {
                     testo: item.parola,
@@ -218,9 +220,8 @@
                 }
             });
 
-            // Usiamo il nuovo algoritmo sicuro per Safari!
-            shuffleArray(row1);
-            shuffleArray(row2);
+            row1.sort(() => Math.random() - 0.5);
+            row2.sort(() => Math.random() - 0.5);
 
             container.innerHTML = '';
             
