@@ -8,10 +8,10 @@
     <style>
         :root {
             --bg-color: #f2f2f7; 
-            --card-low: #ffffff;      /* Bassa: Sfondo bianco */
-            --card-medium: #e1f5fe;   /* Media: Azzurro chiarissimo */
-            --card-high: #90caf9;     /* Alta: Azzurro schiarito per TESTO NERO perfetto */
-            --card-extreme: #001d3d;  /* Altissima: Blu scuro, testo bianco */
+            --card-low: #ffffff;
+            --card-medium: #e1f5fe;
+            --card-high: #90caf9;
+            --card-extreme: #001d3d;
             --text-dark: #1c1c1e;
             --text-light: #ffffff;
         }
@@ -23,7 +23,6 @@
         
         .news-card { position: relative; border-radius: 24px; padding: 20px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         
-        /* Priorità - Colori Testo */
         .priority-Bassa { background-color: var(--card-low); color: var(--text-dark); }
         .priority-Media { background-color: var(--card-medium); color: var(--text-dark); }
         .priority-Alta { background-color: var(--card-high); color: var(--text-dark); }
@@ -32,7 +31,6 @@
         .source-info { font-size: 11px; font-weight: 700; text-transform: uppercase; opacity: 0.8; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
         .content { font-size: 16px; line-height: 1.4; font-weight: 500; margin-bottom: 10px; }
         
-        /* Tasto Continua e Testo Esteso */
         .btn-continua { font-size: 12px; font-weight: 700; color: #007aff; cursor: pointer; display: inline-block; margin-bottom: 15px; background: rgba(0,122,255,0.1); padding: 4px 10px; border-radius: 10px;}
         .priority-Altissima .btn-continua { color: #ffffff; background: rgba(255,255,255,0.2); }
         .testo-esteso { display: none; font-size: 14px; line-height: 1.5; font-weight: 400; margin-bottom: 15px; opacity: 0.9; padding: 12px; background: rgba(0,0,0,0.04); border-radius: 8px; }
@@ -43,7 +41,7 @@
         .banner { font-size: 10px; font-weight: 700; padding: 5px 10px; border-radius: 8px; background: rgba(0, 0, 0, 0.05); border: 1px solid rgba(0, 0, 0, 0.05); cursor: pointer; color: inherit; text-decoration: none;}
         .priority-Altissima .banner { background: rgba(255, 255, 255, 0.15); border-color: rgba(255, 255, 255, 0.1); color: white; }
         
-        .plus-btn { width: 28px; height: 28px; background: rgba(0,0,0,0.05); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; }
+        .plus-btn { width: 28px; height: 28px; background: rgba(0,0,0,0.05); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; user-select: none; }
         .priority-Altissima .plus-btn { background: rgba(255,255,255,0.2); }
         
         .related-news { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(0,0,0,0.1); font-size: 13px; }
@@ -61,10 +59,10 @@
             <h1>AggNews</h1>
             <p id="clock" style="font-size: 13px; opacity: 0.5; margin: 5px 0;"></p>
         </header>
-        <div id="feed"></div>
+        <div id="feed">
+            <p style="text-align:center; opacity:0.5; font-size:14px; margin-top:40px;">Caricamento ultime notizie...</p>
+        </div>
     </div>
-
-    <script src="notizie.js"></script>
 
     <script>
         function updateClock() {
@@ -73,20 +71,30 @@
         }
         updateClock();
 
-        function toggleElement(id) {
+        function toggleElement(id, btnElement) {
             const el = document.getElementById(id);
-            el.style.display = (el.style.display === "none" || el.style.display === "") ? "block" : "none";
+            if (el.style.display === "none" || el.style.display === "") {
+                el.style.display = "block";
+                if (btnElement && btnElement.classList.contains('plus-btn')) btnElement.innerText = "-";
+            } else {
+                el.style.display = "none";
+                if (btnElement && btnElement.classList.contains('plus-btn')) btnElement.innerText = "+";
+            }
         }
 
         function displayNews() {
             const feed = document.getElementById('feed');
             feed.innerHTML = '';
 
-            // 1. ORDINAMENTO RIGOROSO TEMPORALE (Anti-cronologico Puro)
-            // L'orario e il timestamp vincono su tutto, a prescindere dall'importanza!
+            if (typeof newsData === 'undefined' || newsData.length === 0) {
+                feed.innerHTML = '<p style="text-align:center;">Nessuna notizia disponibile al momento.</p>';
+                return;
+            }
+
+            // 1. Ordina temporalmente tutte le notizie a prescindere
             newsData.sort((a, b) => b.timestamp - a.timestamp);
 
-            // 2. RAGGRUPPAMENTO NOTIZIE CORRELATE
+            // 2. Raggruppa per evento
             const gruppi = {};
             newsData.forEach(item => {
                 const idG = item.id_gruppo !== undefined ? item.id_gruppo : item.titolo_orig;
@@ -94,29 +102,32 @@
                 gruppi[idG].push(item);
             });
 
-            // 3. RENDERIZZAZIONE
-            for (const id_gruppo in gruppi) {
-                const correlate = gruppi[id_gruppo];
+            // 3. Trasforma in array e ordina i gruppi in base all'elemento più recente di ciascun gruppo
+            const arrayGruppi = Object.values(gruppi);
+            arrayGruppi.sort((gruppoA, gruppoB) => gruppoB[0].timestamp - gruppoA[0].timestamp);
+
+            // 4. Renderizzazione
+            arrayGruppi.forEach(correlate => {
                 const mainItem = correlate[0];
                 const uid = Math.random().toString(36).substr(2, 9); 
 
                 let bannersHTML = '';
                 const lang = (mainItem.lingua_originale || '').toUpperCase();
-                if (lang === 'EN') {
-                    bannersHTML = `<a href="${mainItem.link}" target="_blank" class="banner">FONTE</a>`;
-                } else if (lang !== 'IT' && lang !== 'EN') {
+                
+                // Aggiunge traduttore solo se non è IT o EN
+                if (lang !== 'IT' && lang !== 'EN') {
                     const linkTranslate = `https://translate.google.com/translate?sl=auto&tl=en&u=${encodeURIComponent(mainItem.link)}`;
-                    bannersHTML = `<a href="${linkTranslate}" target="_blank" class="banner">EN</a>
-                                   <a href="${mainItem.link}" target="_blank" class="banner">FONTE</a>`;
+                    bannersHTML += `<a href="${linkTranslate}" target="_blank" class="banner">EN</a>`;
                 }
+                // Il tasto FONTE c'è sempre
+                bannersHTML += `<a href="${mainItem.link}" target="_blank" class="banner">FONTE</a>`;
 
                 let plusBtnHTML = `<div style="width: 28px;"></div>`; 
                 let relatedHTML = '';
                 if (correlate.length > 1) {
-                    plusBtnHTML = `<div class="plus-btn" onclick="toggleElement('rel-${uid}')">+</div>`;
+                    plusBtnHTML = `<div class="plus-btn" onclick="toggleElement('rel-${uid}', this)">+</div>`;
                     relatedHTML = `<div id="rel-${uid}" class="related-news"><ul>`;
                     for (let i = 1; i < correlate.length; i++) {
-                        // ORA SI VEDE IL TITOLO ORIGINALE (classe titolo-correlata)
                         relatedHTML += `<li><b>${correlate[i].orario} | ${correlate[i].testata}</b>
                                         <span class="titolo-correlata">${correlate[i].titolo_orig}</span>
                                         <a href="${correlate[i].link}" target="_blank">Continua a leggere la fonte</a></li>`;
@@ -124,11 +135,10 @@
                     relatedHTML += `</ul></div>`;
                 }
 
-                // TASTO CONTINUA
                 let continuaHTML = '';
                 if (mainItem.contenuto_esteso && mainItem.contenuto_esteso.length > 15) {
                     continuaHTML = `
-                        <div class="btn-continua" onclick="toggleElement('ext-${uid}')">CONTINUA L'ANTEPRIMA</div>
+                        <div class="btn-continua" onclick="toggleElement('ext-${uid}')">CONTINUA</div>
                         <div id="ext-${uid}" class="testo-esteso">${mainItem.contenuto_esteso}</div>
                     `;
                 }
@@ -153,10 +163,16 @@
                 `;
                 
                 feed.insertAdjacentHTML('beforeend', cardHTML);
-            }
+            });
         }
 
-        displayNews();
+        // ANTI-CACHE DINAMICO: Forza il browser a scaricare il file fresco
+        const script = document.createElement('script');
+        script.src = 'notizie.js?v=' + new Date().getTime();
+        script.onload = () => { displayNews(); };
+        script.onerror = () => { document.getElementById('feed').innerHTML = '<p>Errore di connessione.</p>'; };
+        document.body.appendChild(script);
+
     </script>
 </body>
 </html>
