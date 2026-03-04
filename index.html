@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AggNews AI</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-color: #f2f2f7; 
@@ -16,13 +16,53 @@
             --text-light: #ffffff;
         }
 
-        body { font-family: 'Inter', -apple-system, sans-serif; background-color: var(--bg-color); color: var(--text-dark); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-dark); margin: 0; padding: 0 20px 20px 20px; display: flex; flex-direction: column; align-items: center; }
         .container { width: 100%; max-width: 500px; }
-        header { width: 100%; padding: 20px 0; margin-bottom: 10px; }
-        header h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; margin: 0; }
         
+        header { 
+            width: 100%; 
+            padding: 15px 0 10px 0; 
+            margin-bottom: 15px; 
+            position: sticky; 
+            top: 0; 
+            z-index: 1000; 
+            background: rgba(242, 242, 247, 0.92); 
+            backdrop-filter: blur(12px); 
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            display: flex; 
+            justify-content: space-between; 
+            align-items: flex-end; 
+        }
+        
+        .header-left { flex: 0 0 auto; display: flex; flex-direction: column; justify-content: flex-end; }
+        header h1 { font-size: 32px; font-weight: 800; letter-spacing: -1px; margin: 0; line-height: 1; color: #002244;}
+        header p#clock { font-size: 13px; font-weight: 600; opacity: 0.6; margin: 6px 0 1px 0; line-height: 1; }
+
+        .header-right {
+            flex: 1 1 auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            gap: 3px; 
+            padding-left: 25px; 
+            overflow: hidden;
+        }
+        
+        .word-row {
+            display: flex;
+            justify-content: space-between; 
+            align-items: baseline; 
+            width: 100%;
+        }
+
+        .trend-word {
+            text-transform: capitalize;
+            letter-spacing: -0.5px;
+            line-height: 1.1;
+        }
+
         .news-card { position: relative; border-radius: 24px; padding: 20px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        
         .priority-Bassa { background-color: var(--card-low); color: var(--text-dark); }
         .priority-Media { background-color: var(--card-medium); color: var(--text-dark); }
         .priority-Alta { background-color: var(--card-high); color: var(--text-dark); }
@@ -56,9 +96,13 @@
 
     <div class="container">
         <header>
-            <h1>AggNews</h1>
-            <p id="clock" style="font-size: 13px; opacity: 0.5; margin: 5px 0;"></p>
+            <div class="header-left">
+                <h1>AggNews</h1>
+                <p id="clock"></p>
+            </div>
+            <div class="header-right" id="trending-topics"></div>
         </header>
+        
         <div id="feed">
             <p style="text-align:center; opacity:0.5; font-size:14px; margin-top:40px;">Caricamento ultime notizie...</p>
         </div>
@@ -82,6 +126,132 @@
             }
         }
 
+        // --- NUOVO SISTEMA ANTI-CRASH PER SAFARI ---
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+        // -------------------------------------------
+
+        function generaTrendingTags() {
+            if (typeof newsData === 'undefined' || newsData.length === 0) return;
+
+            const container = document.getElementById('trending-topics');
+            if (!container) return;
+
+            const stopWords = [
+                'il','lo','la','i','gli','le','un','uno','una','di','a','da','in','con','su','per','tra','fra','che','e','ed','o','ma','se','non','più','come','al','del','della','delle','dei','degli','alla','alle','ai','agli','dal','dalla','dalle','dai','dagli','nel','nella','nelle','nei','negli','sul','sulla','sulle','sui','sugli','è','ha','hanno','sono','essere','stato','stata','stati','questo','questa','quello','quella','ci','si','ne','da','fa','fare','cui','chi','cosa','anche','dopo','due','tre','anni','giorni','oggi','ieri','può','senza','quando','dove','loro','tutti','tutto','stesso','stessa','nuovo','nuova','dell','all','sull','dall','nell','c\'è','vengono','viene','prima','secondo','parte','sarebbe','fatto',
+                'medio','contro','verso','mentre','durante','fino','oltre','ogni','molto','poco','troppo','tanto','sempre','mai','ancora','già','solo','quasi','forse','bene','male','grande','grandi','piccolo','piccoli','primo','primi','ultimo','ultima','ultimi','modo','anno','mese','mesi','giorno','ore','ora','domani','poi','qui','lì','là','meno','quanto','quale','quali','perché','poiché','invece','oppure','inoltre','tuttavia','dunque','quindi','infatti','insomma','deve','devono','dovrebbe','farà','fanno','avrebbe','sarà','saranno'
+            ];
+
+            let testoTotale = "";
+            newsData.forEach(news => {
+                if(news.testo_it) testoTotale += " " + news.testo_it.toLowerCase();
+            });
+
+            // Regex alleggerita per non far arrabbiare Safari
+            let parole = testoTotale.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()"'’]/g, " ").split(/\s+/);
+            let conteggioGrezzo = {};
+
+            parole.forEach(p => {
+                if(p.length > 3 && !stopWords.includes(p) && isNaN(p)) {
+                    conteggioGrezzo[p] = (conteggioGrezzo[p] || 0) + 1;
+                }
+            });
+
+            let conteggioPulito = {};
+            Object.keys(conteggioGrezzo).forEach(w => {
+                let count = conteggioGrezzo[w];
+                let trovataSimile = false;
+
+                for(let ex of Object.keys(conteggioPulito)) {
+                    if (w.length >= 4 && ex.length >= 4) {
+                        if (w.startsWith(ex) || ex.startsWith(w) || w.substring(0, w.length-1) === ex.substring(0, ex.length-1)) {
+                            if(w.length < ex.length) {
+                                conteggioPulito[w] = conteggioPulito[ex] + count;
+                                delete conteggioPulito[ex];
+                            } else {
+                                conteggioPulito[ex] += count;
+                            }
+                            trovataSimile = true;
+                            break;
+                        }
+                    }
+                }
+                if(!trovataSimile) conteggioPulito[w] = count;
+            });
+
+            let arrParole = Object.keys(conteggioPulito).map(k => ({ parola: k, count: conteggioPulito[k] }));
+            arrParole.sort((a, b) => b.count - a.count);
+            
+            let topWords = arrParole.slice(0, 14);
+            if(topWords.length === 0) return;
+
+            const fontWeights = [900, 800, 700, 700, 600, 600, 500, 500, 400, 400, 300, 300, 300, 300];
+            const fontSizes = [15, 14, 14, 13, 13, 12, 12, 11, 11, 10, 10, 10, 10, 10]; 
+            const colors = ['#001833', '#00264d', '#003366', '#004080', '#004d99', '#0059b3', '#0066cc', '#0073e6', '#1a82ff', '#3391ff', '#4d9fff', '#5ca8ff', '#5ca8ff', '#5ca8ff'];
+
+            let paroleStilizzate = topWords.map((item, index) => {
+                return {
+                    testo: item.parola,
+                    peso: fontWeights[index] || 300,
+                    grandezza: fontSizes[index] || 10,
+                    colore: colors[index] || '#5ca8ff',
+                    ingombro: item.parola.length * (fontSizes[index] || 10)
+                };
+            });
+
+            paroleStilizzate.sort((a, b) => b.ingombro - a.ingombro);
+
+            let row1 = [], row2 = [];
+            let larghezzaRiga1 = 0, larghezzaRiga2 = 0;
+
+            paroleStilizzate.forEach(item => {
+                if (larghezzaRiga1 <= larghezzaRiga2) {
+                    row1.push(item);
+                    larghezzaRiga1 += item.ingombro;
+                } else {
+                    row2.push(item);
+                    larghezzaRiga2 += item.ingombro;
+                }
+            });
+
+            // Usiamo il nuovo algoritmo sicuro per Safari!
+            shuffleArray(row1);
+            shuffleArray(row2);
+
+            container.innerHTML = '';
+            
+            let divRiga1 = document.createElement('div');
+            divRiga1.className = 'word-row';
+            row1.forEach(item => {
+                let span = document.createElement('span');
+                span.textContent = item.testo;
+                span.className = 'trend-word';
+                span.style.fontWeight = item.peso;
+                span.style.fontSize = item.grandezza + 'px';
+                span.style.color = item.colore;
+                divRiga1.appendChild(span);
+            });
+
+            let divRiga2 = document.createElement('div');
+            divRiga2.className = 'word-row';
+            row2.forEach(item => {
+                let span = document.createElement('span');
+                span.textContent = item.testo;
+                span.className = 'trend-word';
+                span.style.fontWeight = item.peso;
+                span.style.fontSize = item.grandezza + 'px';
+                span.style.color = item.colore;
+                divRiga2.appendChild(span);
+            });
+
+            container.appendChild(divRiga1);
+            container.appendChild(divRiga2);
+        }
+
         function displayNews() {
             const feed = document.getElementById('feed');
             feed.innerHTML = '';
@@ -91,10 +261,8 @@
                 return;
             }
 
-            // 1. Ordina temporalmente tutte le notizie a prescindere
             newsData.sort((a, b) => b.timestamp - a.timestamp);
 
-            // 2. Raggruppa per evento
             const gruppi = {};
             newsData.forEach(item => {
                 const idG = item.id_gruppo !== undefined ? item.id_gruppo : item.titolo_orig;
@@ -102,11 +270,9 @@
                 gruppi[idG].push(item);
             });
 
-            // 3. Trasforma in array e ordina i gruppi in base all'elemento più recente di ciascun gruppo
             const arrayGruppi = Object.values(gruppi);
             arrayGruppi.sort((gruppoA, gruppoB) => gruppoB[0].timestamp - gruppoA[0].timestamp);
 
-            // 4. Renderizzazione
             arrayGruppi.forEach(correlate => {
                 const mainItem = correlate[0];
                 const uid = Math.random().toString(36).substr(2, 9); 
@@ -114,12 +280,10 @@
                 let bannersHTML = '';
                 const lang = (mainItem.lingua_originale || '').toUpperCase();
                 
-                // Aggiunge traduttore solo se non è IT o EN
                 if (lang !== 'IT' && lang !== 'EN') {
                     const linkTranslate = `https://translate.google.com/translate?sl=auto&tl=en&u=${encodeURIComponent(mainItem.link)}`;
                     bannersHTML += `<a href="${linkTranslate}" target="_blank" class="banner">EN</a>`;
                 }
-                // Il tasto FONTE c'è sempre
                 bannersHTML += `<a href="${mainItem.link}" target="_blank" class="banner">FONTE</a>`;
 
                 let plusBtnHTML = `<div style="width: 28px;"></div>`; 
@@ -130,7 +294,7 @@
                     for (let i = 1; i < correlate.length; i++) {
                         relatedHTML += `<li><b>${correlate[i].orario} | ${correlate[i].testata}</b>
                                         <span class="titolo-correlata">${correlate[i].titolo_orig}</span>
-                                        <a href="${correlate[i].link}" target="_blank">Continua a leggere la fonte</a></li>`;
+                                        <a href="${correlate[i].link}" target="_blank">Continua</a></li>`;
                     }
                     relatedHTML += `</ul></div>`;
                 }
@@ -166,10 +330,9 @@
             });
         }
 
-        // ANTI-CACHE DINAMICO: Forza il browser a scaricare il file fresco
         const script = document.createElement('script');
         script.src = 'notizie.js?v=' + new Date().getTime();
-        script.onload = () => { displayNews(); };
+        script.onload = () => { displayNews(); generaTrendingTags(); };
         script.onerror = () => { document.getElementById('feed').innerHTML = '<p>Errore di connessione.</p>'; };
         document.body.appendChild(script);
 
