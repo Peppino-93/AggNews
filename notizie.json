@@ -1,0 +1,142 @@
+[
+    {
+        "testata": "ANSA",
+        "nazione": "it",
+        "lingua_originale": "it",
+        "titolo_originale": "Nicaragua, il giornale La Prensa compie 100 anni ma rimane in esilio",
+        "testo_it": "La Prensa (Nicaragua): 100 anni ma resta in esilio, simbolo di libertà di stampa negata.",
+        "priorita": "Alta",
+        "link": "https://www.ansa.it/sito/notizie/mondo/americalatina/2026/03/01/nicaragua-il-giornale-la-prensa-compie-100-anni-ma-rimane-in-esilio_b3053417-8825-4310-8afb-e134d14cf37f.html",
+        "orario": "19:22"
+    },
+    {
+        "testata": "AGI",
+        "nazione": "it",
+        "lingua_originale": "it",
+        "titolo_originale": "Morto anche l'ex presidente Ahmadinejad. Fra due giorni il successore di Khamenei. Uccisi ...",
+        "testo_it": "Ex presidente Ahmadinejad morto. Successore di Khamenei tra 2 giorni. Ulteriori uccisioni.",
+        "priorita": "Altissima",
+        "link": "https://www.agi.it/estero/news/2026-03-01/iran-attacco-khamenei-morto-35877779/",
+        "orario": "19:23"
+    },
+    {
+        "testata": "Adnkronos",
+        "nazione": "it",
+        "lingua_originale": "it",
+        "titolo_originale": "Daniele Scardina, come sta l'ex pugile: \"Sogno di tornare a camminare\"",
+        "testo_it": "Daniele Scardina, l'ex pugile, sogna di tornare a camminare.",
+        "priorita": "Media",
+        "link": "https://www.adnkronos.com/spettacoli/daniele-scardina-come-sta-lex-pugile-sogno-di-tornare-a-camminare_36wgzZh959YSwCCVpx6McV",
+        "orario": "19:23"
+    },
+    {
+        "testata": "BBC News",
+        "nazione": "uk",
+        "lingua_originale": "en",
+        "titolo_originale": "At least 153 dead after reported strike on school, Iran says",
+        "testo_it": "Iran: 153 morti dopo presunto attacco a scuola, denuncia Teheran.",
+        "priorita": "Altissima",
+        "link": "https://www.bbc.com/news/articles/c1l7rvqq51eo?at_medium=RSS&at_campaign=rss",
+        "orario": "19:23"
+    },
+    {
+        "testata": "Deutsche Welle",
+        "nazione": "de",
+        "lingua_originale": "en",
+        "titolo_originale": "Will Iran conflict send oil prices above $100 a barrel?",
+        "testo_it": "Conflitto Iran: il petrolio supererà i $100 al barile?",
+        "priorita": "Altissima",
+        "link": "https://www.dw.com/en/will-iran-conflict-send-oil-prices-above-100-a-barrel/a-76176495?maca=en-rss-en-world-4025-rdf",
+        "orario": "19:23"
+    },
+    {
+        "testata": "France 24",
+        "nazione": "fr",
+        "lingua_originale": "en",
+        "titolo_originale": "Iran launches attacks on Israel: Nine killed by strikes near Jerusalem",
+        "testo_it": "Attacchi iraniani su Israele: 9 morti vicino a Gerusalemme.",
+        "priorita": "Altissima",
+        "link": "https://www.france24.com/en/iran-launches-attacks-on-israel-nine-killed-by-strikes-near-jerusalem",
+        "orario": "19:23"
+    },
+    {
+        "testata": "The New York Times",
+        "nazione": "us",
+        "lingua_originale": "en",
+        "titolo_originale": "Who Could Take Over for Ayatollah Ali Khamenei?",
+        "testo_it": "Iran: i possibili successori dell'Ayatollah Ali Khamenei.",
+        "priorita": "Altissima",
+        "link": "https://www.nytimes.com/2026/02/28/world/middleeast/ali-khamenei-iran-leader-succession.html",
+        "orario": "19:24"
+    },
+    {
+        "testata": "The Guardian",
+        "nazione": "uk",
+        "lingua_originale": "en",
+        "titolo_originale": "Ghana says at least 55 of its people killed after Russia ‘lured’ them to fight Ukraine",
+        "testo_it": "Ghana: almeno 55 cittadini uccisi in Ucraina, ‘adescati’ dalla Russia.",
+        "priorita": "Media",
+        "link": "https://www.theguardian.com/world/2026/feb/27/ghana-men-killed-fight-russia-ukraine",
+        "orario": "19:24"
+    },
+    {
+        "testata": "Le Monde",
+        "nazione": "fr",
+        "lingua_originale": "fr",
+        "titolo_originale": "EN DIRECT, Iran : de puissantes explosions secouent à nouveau Téhéran dimanche soir ; Emmanuel Macron réunit un conseil de défense à l’Elysée",
+        "testo_it": "Iran: Nuove potenti esplosioni a Teheran; Macron convoca consiglio difesa.",
+        "priorita": "Altissima",
+        "link": "https://www.lemonde.fr/international/live/2026/03/01/en-direct-iran-plusieurs-detonations-entendues-a-teheran-donald-trump-affirme-que-neuf-navires-iraniens-ont-ete-coules_6668663_3210.html",
+        "orario": "19:24"
+    },
+    {
+        "testata": "Libération",
+        "nazione": "fr",
+        "lingua_originale": "fr",
+        "titolo_originale": "EN DIRECT - Guerre contre l’Iran : Donald Trump dit qu’il «va parler» aux dirigeants iraniens",
+        "testo_it": "Trump: 'Parlerò' ai leader iraniani per evitare guerra. (In diretta)",
+        "priorita": "Alta",
+        "link": "https://www.liberation.fr/international/moyen-orient/en-direct-frappes-en-iran-londe-de-choc-mondiale-apres-la-mort-dali-khamenei-20260301_IGZQBNSCIRGCJNCYY3OZOVDUV4/",
+        "orario": "19:24"
+    },
+    {
+        "testata": "Al Jazeera",
+        "nazione": "qa",
+        "lingua_originale": "en",
+        "titolo_originale": "India beat West Indies by five wickets to enter T20 World Cup semifinals",
+        "testo_it": "India batte West Indies (5 wicket), semifinali T20 World Cup raggiunte.",
+        "priorita": "Media",
+        "link": "https://www.aljazeera.com/sports/2026/3/1/india-beat-west-indies-by-five-wickets-to-enter-t20-world-cup-semifinals?traffic_source=rss",
+        "orario": "19:24"
+    },
+    {
+        "testata": "South China Morning Post",
+        "nazione": "hk",
+        "lingua_originale": "en",
+        "titolo_originale": "3 dead, 14 injured in Texas bar shooting",
+        "testo_it": "Texas: sparatoria in un bar, 3 morti e 14 feriti.",
+        "priorita": "Alta",
+        "link": "https://www.scmp.com/news/world/united-states-canada/article/3345055/3-dead-14-injured-texas-bar-shooting?utm_source=rss_feed",
+        "orario": "19:24"
+    },
+    {
+        "testata": "Times of India",
+        "nazione": "in",
+        "lingua_originale": "en",
+        "titolo_originale": "'India stands in solidarity': PM Modi speaks to UAE prez, condemns attacks by Iran",
+        "testo_it": "Modi (India) esprime solidarietà agli Emirati Arabi Uniti e condanna gli attacchi iraniani",
+        "priorita": "Alta",
+        "link": "https://timesofindia.indiatimes.com/world/middle-east/israel-iran-war-news-live-udates-conflict-attack-state-of-emergency-explosions-tehran-us-ali-khamenei/liveblog/128877850.cms",
+        "orario": "19:25"
+    },
+    {
+        "testata": "The Hill",
+        "nazione": "us",
+        "lingua_originale": "en",
+        "titolo_originale": "Graham: US not going to ‘occupy’ Iran",
+        "testo_it": "Graham: gli USA non intendono occupare l'Iran.",
+        "priorita": "Alta",
+        "link": "https://thehill.com/homenews/senate/5761713-us-iran-future-leadership/",
+        "orario": "19:25"
+    }
+]
